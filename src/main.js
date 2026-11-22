@@ -1,12 +1,15 @@
+import { catalogCopy, agentIds as AGENT_IDS } from './catalog-data.js';
 import { T, LANGS } from './i18n.js';
 import { createFlow } from './flow.js';
-import { AGENT_DEMOS, submitDeveloperApplication, submitConnectionRequest } from './api.js';
+import { createWave } from './wave.js';
+import { setupFx, splitWords, trackProgress, onScrollFx } from './fx.js';
+import { setupSmoothScroll, pauseScroll, setupNavPill, splitHeading, setupPrism, onScrollPrism } from './prism.js';
+import { submitDeveloperApplication, submitConnectionRequest } from './api.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const desktopScene = window.matchMedia('(min-width: 901px)');
 
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
@@ -16,20 +19,29 @@ const store = {
 /* =========================================================
    Data
    ========================================================= */
-/** @type {import('./api.js').AgentId[]} */
-const AGENT_IDS = ['sup', 'mkt', 'hr'];
-const AGENT_ICONS = {
-  sup: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14v10H11l-4 3v-3H5z"/></svg>',
-  mkt: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4h3l6 4V6L7 10H4zM17 9a4 4 0 0 1 0 6"/></svg>',
-  hr: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="8" r="3.4"/><path d="M4 19c.8-3.2 3.2-5 6-5s5.2 1.8 6 5M16 11l1.6 1.6L21 9"/></svg>',
-};
-
 /* =========================================================
    i18n
    ========================================================= */
 let lang = store.get('keme-lang');
 if (!LANGS.includes(lang)) lang = 'ru';
 const t = (k) => (T[lang] && T[lang][k] !== undefined ? T[lang][k] : T.ru[k]);
+const fx = setupFx({ reducedMotion, getText: (k) => t(k) });
+setupSmoothScroll(reducedMotion);
+let navPill = null;
+// headlines rise word by word instead of fading as a block
+if (!reducedMotion) {
+  $$('h1.display[data-reveal], .h2[data-reveal]').forEach((el) => { el.removeAttribute('data-reveal'); el.setAttribute('data-split', ''); });
+}
+// cinematic intro (pure CSS animation): hero waits for the bars to open, then the intro is dropped
+const intro = $('.intro');
+if (intro) {
+  if (reducedMotion) intro.remove();
+  else {
+    document.documentElement.classList.add('intro-play');
+    setTimeout(() => intro.remove(), 2300);
+    setTimeout(() => document.documentElement.classList.remove('intro-play'), 3600);
+  }
+}
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 
 function applyLang(next) {
@@ -43,11 +55,14 @@ function applyLang(next) {
     b.classList.toggle('is-active', on);
     b.setAttribute('aria-pressed', on);
   });
-  renderAgents();
+  $('#catalogLink span').textContent = catalogCopy(lang).browse;
   renderAreas();
   renderSelects();
   setStep(step, false);
-  renderDemo(demoAgent, false);
+  renderPipe(false);
+  if (fx.enabled) $$('[data-read]').forEach(splitWords);
+  $$('[data-split]').forEach(splitHeading);
+  fx.refresh();
   store.set('keme-lang', lang);
   requestAnimationFrame(() => { drawLinks(); onScroll(); });
 }
@@ -69,21 +84,6 @@ const observeReveals = (root = document) => $$('[data-reveal]:not(.in)', root).f
    Nav
    ========================================================= */
 const nav = $('#nav');
-const burger = $('.nav__burger');
-const setMenu = (open) => { nav.classList.toggle('is-open', open); burger.setAttribute('aria-expanded', open); };
-burger.addEventListener('click', () => setMenu(!nav.classList.contains('is-open')));
-$$('.nav__mobile a, .nav__mobile button').forEach((a) => a.addEventListener('click', () => setMenu(false)));
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
-
-const navLinks = $$('.nav__links a');
-const sectionsForNav = [['#top', $('#scene')], ['#platform', $('#platform')], ['#agents', $('#agents')], ['#developers', $('#developers')]];
-function updateNavCurrent() {
-  const y = window.innerHeight * 0.35;
-  let current = '#top';
-  sectionsForNav.forEach(([href, el]) => { if (el.getBoundingClientRect().top <= y) current = href; });
-  navLinks.forEach((a) => a.classList.toggle('is-current', a.getAttribute('href') === current));
-}
-
 /* =========================================================
    Toast
    ========================================================= */
@@ -99,16 +99,20 @@ function showToast(msg) {
 /* =========================================================
    1–2 Flow visuals
    ========================================================= */
-const flows = { stage: null, hero: null, route: null, band: null };
-function setupFlows() {
-  const desk = desktopScene.matches;
-  if (desk && !flows.stage) flows.stage = createFlow($('[data-flow="scroll"]'), { reducedMotion });
-  if (!desk && !flows.hero) {
-    flows.hero = createFlow($('[data-flow="0"]'), { reducedMotion, progress: 0 });
-    flows.route = createFlow($('[data-flow="1"]'), { reducedMotion, progress: 1 });
-  }
-  if (!flows.band) flows.band = createFlow($('[data-flow="band"]'), { variant: 'band', reducedMotion });
+function setupEndingWave() {
+  const ending = $('.ending');
+  const box = $('[data-wave]');
+  return createWave(box, { zones: [ending], reducedMotion })
+    || createFlow(box, { variant: 'band', reducedMotion, zone: reducedMotion ? null : ending });
 }
+// hold zones: grabbing cursor + no text selection while the button is down
+document.addEventListener('pointerdown', (e) => {
+  if (e.button !== 0) return;
+  const z = e.target.closest('[data-hold]');
+  if (!z) return;
+  z.classList.add('is-holding');
+  window.addEventListener('pointerup', () => z.classList.remove('is-holding'), { once: true });
+});
 function sceneProgress() {
   const result = $('#result');
   const r = result.getBoundingClientRect();
@@ -121,26 +125,38 @@ function sceneProgress() {
    ========================================================= */
 const pscheme = $('#pscheme');
 const plinks = $('#plinks');
-function drawLinks() {
-  if (getComputedStyle(plinks).display === 'none') return;
-  const box = pscheme.getBoundingClientRect();
-  const hub = $('#phub').getBoundingClientRect();
+function linkGeom(card, box, hub) {
   const hubL = hub.left - box.left, hubR = hub.right - box.left;
   const hubY = hub.top - box.top + hub.height / 2;
-  let d = '<defs><linearGradient id="plinkGrad" x1="0" x2="1"><stop offset="0" stop-color="#3ae6dc"/><stop offset="1" stop-color="#8cc4ff"/></linearGradient></defs>';
-  $$('.pcard', pscheme).forEach((card) => {
-    const c = card.getBoundingClientRect();
-    const y = c.top - box.top + c.height / 2;
-    const isDev = card.closest('[data-side="dev"]');
-    const x1 = isDev ? c.right - box.left : hubR;
-    const x2 = isDev ? hubL : c.left - box.left;
-    const y1 = isDev ? y : hubY + (y - hubY) * 0.25;
-    const y2 = isDev ? hubY + (y - hubY) * 0.25 : y;
-    const k = (x2 - x1) * 0.5;
-    const path = `M${x1},${y1} C${x1 + k},${y1} ${x2 - k},${y2} ${x2},${y2}`;
-    d += `<path d="${path}" data-link="${card.dataset.link}"/><path class="flowing" d="${path}" data-link="${card.dataset.link}"/>`;
+  const c = card.getBoundingClientRect();
+  const y = c.top - box.top + c.height / 2;
+  const isDev = card.closest('[data-side="dev"]');
+  const x1 = isDev ? c.right - box.left : hubR;
+  const x2 = isDev ? hubL : c.left - box.left;
+  const y1 = isDev ? y : hubY + (y - hubY) * 0.25;
+  const y2 = isDev ? hubY + (y - hubY) * 0.25 : y;
+  const k = (x2 - x1) * 0.5;
+  return `M${x1.toFixed(1)},${y1.toFixed(1)} C${(x1 + k).toFixed(1)},${y1.toFixed(1)} ${(x2 - k).toFixed(1)},${y2.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}`;
+}
+function drawLinks() {
+  if (getComputedStyle(plinks).display === 'none') return;
+  const cards = $$('.pcard', pscheme);
+  if (!plinks.dataset.built) {
+    // built once; later calls only move the paths (pulses keep their place while the hub is dragged)
+    plinks.innerHTML = '<defs><linearGradient id="plinkGrad" x1="0" x2="1"><stop offset="0" stop-color="#3ae6dc"/><stop offset="1" stop-color="#8cc4ff"/></linearGradient></defs>'
+      + cards.map((card, i) => {
+        const id = card.dataset.link;
+        const pulse = reducedMotion ? '' : `<circle class="pulse" r="2.6"><animateMotion dur="2.8s" begin="-${(i * 0.47).toFixed(2)}s" repeatCount="indefinite"><mpath href="#pl-${id}"/></animateMotion></circle>`;
+        return `<path id="pl-${id}" pathLength="1" data-link="${id}"/><path class="flowing" data-link="${id}"/>${pulse}`;
+      }).join('');
+    plinks.dataset.built = '1';
+  }
+  const box = pscheme.getBoundingClientRect();
+  const hub = $('#phub').getBoundingClientRect();
+  cards.forEach((card) => {
+    const d = linkGeom(card, box, hub);
+    $$(`path[data-link="${card.dataset.link}"]`, plinks).forEach((p) => p.setAttribute('d', d));
   });
-  plinks.innerHTML = d;
 }
 $$('.pcard', pscheme).forEach((card) => {
   const hot = (on) => {
@@ -150,6 +166,51 @@ $$('.pcard', pscheme).forEach((card) => {
   card.addEventListener('pointerenter', () => hot(true));
   card.addEventListener('pointerleave', () => hot(false));
 });
+
+// draggable hub: pull it, the links stretch, release and it springs back
+const hubEl = $('#phub');
+let hubX = 0, hubY = 0, hubVX = 0, hubVY = 0, hubDrag = null, hubRaf = 0;
+const placeHub = () => { hubEl.style.translate = `${hubX.toFixed(1)}px ${hubY.toFixed(1)}px`; drawLinks(); };
+hubEl.addEventListener('pointerdown', (e) => {
+  if (e.button !== 0 || reducedMotion || getComputedStyle(plinks).display === 'none') return;
+  e.preventDefault();
+  hubEl.setPointerCapture(e.pointerId);
+  cancelAnimationFrame(hubRaf);
+  hubVX = hubVY = 0;
+  hubDrag = { sx: e.clientX, sy: e.clientY, ox: hubX, oy: hubY };
+  hubEl.classList.add('is-dragging');
+  plinks.classList.add('is-pulling');
+});
+hubEl.addEventListener('pointermove', (e) => {
+  if (!hubDrag) return;
+  const R = 80; // rubber band: the further you pull, the harder it gets
+  hubX = R * Math.tanh((hubDrag.ox + (e.clientX - hubDrag.sx) * 0.7) / R);
+  hubY = R * Math.tanh((hubDrag.oy + (e.clientY - hubDrag.sy) * 0.7) / R);
+  placeHub();
+});
+const releaseHub = () => {
+  if (!hubDrag) return;
+  hubDrag = null;
+  hubEl.classList.remove('is-dragging');
+  plinks.classList.remove('is-pulling');
+  let last = performance.now();
+  const step = (now) => {
+    const dt = Math.min(0.032, (now - last) / 1000);
+    last = now;
+    hubVX += (-260 * hubX - 15 * hubVX) * dt;
+    hubVY += (-260 * hubY - 15 * hubVY) * dt;
+    hubX += hubVX * dt; hubY += hubVY * dt;
+    if (Math.abs(hubX) + Math.abs(hubY) + Math.abs(hubVX) + Math.abs(hubVY) < 0.3) {
+      hubX = hubY = hubVX = hubVY = 0; hubEl.style.translate = ''; drawLinks(); return;
+    }
+    placeHub();
+    hubRaf = requestAnimationFrame(step);
+  };
+  hubRaf = requestAnimationFrame(step);
+};
+hubEl.addEventListener('pointerup', releaseHub);
+hubEl.addEventListener('pointercancel', releaseHub);
+if (!reducedMotion) trackProgress(pscheme, '--pp', { start: 0.95, span: 0.6 });
 
 /* =========================================================
    4 Journey stepper (one agent, both sides)
@@ -191,137 +252,31 @@ $('#jr').addEventListener('pointerenter', stopJourney);
 $('#jr').addEventListener('pointerleave', () => { if (!jrTouched) startJourney(); });
 
 /* =========================================================
-   5 Router: typical requests → agent, complex → person
+   5 Why: task -> agent -> ready result (prepared examples, cycling)
    ========================================================= */
-const router = $('#router');
-const chipsBox = $('#routerChips');
-let routerTimer = null;
-let routerN = 0;
-function spawnChip() {
-  const W = router.clientWidth, H = router.clientHeight;
-  const complex = routerN % 4 === 3;
-  const list = t(complex ? 'rt.complex' : 'rt.typical');
-  const text = list[routerN % list.length];
-  routerN++;
-  const el = document.createElement('span');
-  el.className = `rchip${complex ? ' is-h' : ''}`;
-  el.textContent = text;
-  chipsBox.appendChild(el);
-  const w = el.offsetWidth, h = el.offsetHeight;
-  const out = $('.router__col--out', router);
-  const outL = out.offsetLeft, outW = out.offsetWidth;
-  const startY = H * (0.3 + Math.random() * 0.45);
-  const hubX = $('.router__hub', router).offsetLeft - w / 2, hubY = H * 0.5 - h / 2;
-  const endX = outL + 6 + Math.random() * Math.max(0, outW - w - 12);
-  const endY = complex ? H * (0.68 + Math.random() * 0.2) : H * (0.2 + Math.random() * 0.34);
-  const anim = el.animate([
-    { transform: `translate(${W * 0.03}px, ${startY}px)`, opacity: 0 },
-    { transform: `translate(${W * 0.06}px, ${startY}px)`, opacity: 1, offset: 0.12 },
-    { transform: `translate(${hubX}px, ${hubY}px) scale(.9)`, opacity: 1, offset: 0.5 },
-    { transform: `translate(${endX}px, ${endY}px)`, opacity: 1, offset: 0.82 },
-    { transform: `translate(${endX}px, ${endY}px)`, opacity: 0 },
-  ], { duration: 4200, easing: 'cubic-bezier(.45,0,.25,1)' });
-  anim.onfinish = () => el.remove();
-}
-function staticRouter() {
-  chipsBox.innerHTML = '';
-  const W = router.clientWidth, H = router.clientHeight;
-  const place = (text, x, y, complex) => {
-    const el = document.createElement('span');
-    el.className = `rchip${complex ? ' is-h' : ''}`;
-    el.textContent = text;
-    el.style.transform = `translate(${x}px, ${y}px)`;
-    chipsBox.appendChild(el);
-  };
-  const typ = t('rt.typical'), cx = t('rt.complex');
-  const ox = $('.router__col--out', router).offsetLeft + 6;
-  place(typ[0], W * 0.03, H * 0.38); place(cx[0], W * 0.03, H * 0.52, true); place(typ[1], W * 0.03, H * 0.66);
-  place(typ[2], ox, H * 0.24); place(typ[3], ox, H * 0.38);
-  place(cx[1], ox, H * 0.78, true);
+const pipe = $('#pipe');
+let pipeIdx = 0;
+let pipeTimers = [];
+let pipeOn = false;
+function renderPipe(play = true) {
+  pipeTimers.forEach(clearTimeout);
+  pipeTimers = [];
+  const items = t('pp.items');
+  const [task, result] = items[pipeIdx % items.length];
+  $('#pipeIn').textContent = task;
+  $('#pipeOut').textContent = result;
+  if (!play || reducedMotion) { pipe.className = 'pipe is-in is-work is-out in'; return; }
+  pipe.classList.remove('is-in', 'is-work', 'is-out');
+  void pipe.offsetWidth; // restart the CSS animations
+  pipeTimers.push(setTimeout(() => pipe.classList.add('is-in'), 80));
+  pipeTimers.push(setTimeout(() => pipe.classList.add('is-work'), 800));
+  pipeTimers.push(setTimeout(() => pipe.classList.add('is-out'), 1700));
+  pipeTimers.push(setTimeout(() => { pipeIdx++; if (pipeOn) renderPipe(); }, 4400));
 }
 new IntersectionObserver(([e]) => {
-  if (reducedMotion) { if (e.isIntersecting) staticRouter(); return; }
-  if (e.isIntersecting && !routerTimer) { spawnChip(); routerTimer = setInterval(spawnChip, 1300); }
-  if (!e.isIntersecting) { clearInterval(routerTimer); routerTimer = null; }
-}, { threshold: 0.2 }).observe(router);
-
-/* =========================================================
-   6 Demo agent cards
-   ========================================================= */
-let agentsShown = false;
-function renderAgents() {
-  const wrap = $('#agentCards');
-  wrap.innerHTML = AGENT_IDS.map((id) => {
-    const live = AGENT_DEMOS[id].liveDemoUrl;
-    return `
-    <article class="acard" data-reveal>
-      <div class="acard__top">
-        <span class="acard__icon" data-tone="${id}">${AGENT_ICONS[id]}</span>
-        <span class="pill">${esc(t('ag.badge'))}</span>
-      </div>
-      <p class="acard__cat">${esc(t(`${id}.cat`))}</p>
-      <h3>${esc(t(`${id}.name`))}</h3>
-      <p class="acard__task">${esc(t(`${id}.task`))}</p>
-      <ul class="acard__does" aria-label="${esc(t('ag.does'))}">
-        <li>${esc(t(`${id}.p1`))}</li><li>${esc(t(`${id}.p2`))}</li>
-      </ul>
-      <div class="acard__actions">
-        ${live
-          ? `<a class="btn btn--primary btn--sm" href="${esc(live)}">${esc(t('ag.try'))}</a>`
-          : `<button type="button" class="btn btn--primary btn--sm" data-example="${id}">${esc(t('ag.example'))}</button>`}
-        <button type="button" class="btn btn--secondary btn--sm" data-open="conn" data-agent="${id}">${esc(t('ag.request'))}</button>
-      </div>
-    </article>`;
-  }).join('');
-  if (agentsShown) $$('[data-reveal]', wrap).forEach((el) => el.classList.add('in'));
-  else { observeReveals(wrap); agentsShown = true; }
-}
-
-/* =========================================================
-   7 Agent in action (prepared illustration)
-   ========================================================= */
-let demoAgent = 'sup';
-let demoTimers = [];
-let demoPlayed = false;
-function renderDemo(id, play = true) {
-  demoAgent = id;
-  demoTimers.forEach(clearTimeout);
-  demoTimers = [];
-  $$('#acTabs [data-agent]').forEach((b) => {
-    const on = b.dataset.agent === id;
-    b.classList.toggle('is-active', on);
-    b.setAttribute('aria-selected', on);
-  });
-  const demo = $('#demo');
-  $('#demoIn').textContent = t(`ac.${id}.in`);
-  $('#demoOut').textContent = t(`ac.${id}.out`);
-  $('#demoFoot').textContent = t(`ac.${id}.foot`);
-  const steps = t(`ac.${id}.s`);
-  const list = $('#demoSteps');
-  list.innerHTML = steps.map((s) => `<li><i aria-hidden="true"></i><span>${esc(s)}</span></li>`).join('');
-  const live = AGENT_DEMOS[id].liveDemoUrl;
-  $('#demoCta').innerHTML = live
-    ? `<a class="btn btn--primary btn--sm" href="${esc(live)}">${esc(t('ag.try'))}</a>`
-    : `<button type="button" class="btn btn--primary btn--sm" data-open="conn" data-agent="${id}">${esc(t('ac.access'))}</button>`;
-
-  const items = $$('li', list);
-  if (!play || reducedMotion) {
-    items.forEach((li) => { li.classList.add('is-done'); li.querySelector('i').textContent = '✓'; });
-    demo.classList.add('is-done');
-    return;
-  }
-  demo.classList.remove('is-done');
-  items.forEach((li, k) => {
-    demoTimers.push(setTimeout(() => li.classList.add('is-run'), 300 + k * 900));
-    demoTimers.push(setTimeout(() => { li.classList.remove('is-run'); li.classList.add('is-done'); li.querySelector('i').textContent = '✓'; }, 300 + k * 900 + 800));
-  });
-  demoTimers.push(setTimeout(() => demo.classList.add('is-done'), 300 + items.length * 900));
-}
-$$('#acTabs [data-agent]').forEach((b) => b.addEventListener('click', () => renderDemo(b.dataset.agent)));
-$('#demoReplay').addEventListener('click', () => renderDemo(demoAgent));
-new IntersectionObserver(([e]) => {
-  if (e.isIntersecting && !demoPlayed) { demoPlayed = true; renderDemo(demoAgent); }
-}, { threshold: 0.35 }).observe($('#demo'));
+  pipeOn = e.isIntersecting;
+  if (pipeOn) renderPipe(); else pipeTimers.forEach(clearTimeout);
+}, { threshold: 0.3 }).observe(pipe);
 
 /* =========================================================
    8 Areas
@@ -329,10 +284,10 @@ new IntersectionObserver(([e]) => {
 function renderAreas() {
   const live = t('ar.liveItems');
   $('#areasLive').innerHTML = AGENT_IDS.map((id) => `
-    <article class="alive">
+    <article class="alive" data-tilt="5">
       <h3>${esc(live[id][0])}</h3>
       <p>${esc(live[id][1])}</p>
-      <button type="button" class="link" data-example="${id}">${esc(t('ar.see'))} →</button>
+      <a class="link" href="/catalog/">${esc(t('ar.see'))} →</a>
     </article>`).join('');
   $('#areasSoon').innerHTML = t('ar.soonItems').map((s) => `<li>${esc(s)}</li>`).join('');
 }
@@ -367,6 +322,7 @@ function openModal(kind, agent) {
   modal.hidden = false;
   modal.classList.remove('is-closing');
   document.body.style.overflow = 'hidden';
+  pauseScroll(true);
   setTimeout(() => forms[kind].querySelector('input, select, textarea')?.focus(), 60);
 }
 function closeModal() {
@@ -376,6 +332,7 @@ function closeModal() {
     modal.hidden = true;
     modal.classList.remove('is-closing');
     document.body.style.overflow = '';
+    pauseScroll(false);
     lastFocus?.focus();
   }, 180);
 }
@@ -477,23 +434,31 @@ $('#doneAgain').addEventListener('click', () => { done.hidden = true; forms[open
 document.addEventListener('click', (e) => {
   const open = e.target.closest('[data-open]');
   if (open) { openModal(open.dataset.open, open.dataset.agent); return; }
-  const ex = e.target.closest('[data-example]');
-  if (ex) {
-    renderDemo(ex.dataset.example);
-    demoPlayed = true;
-    $('#action').scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth' });
-    return;
-  }
   if (e.target.closest('[data-action="login"]')) showToast(t('toast.login'));
 });
 
 /* =========================================================
    Scroll + resize
    ========================================================= */
+// nav slides away while reading down, comes back on the slightest scroll up
+let lastNavY = window.scrollY;
+function updateNavHide() {
+  const y = window.scrollY;
+  const dy = y - lastNavY;
+  const keep = nav.classList.contains('is-open') || nav.contains(document.activeElement) || y < 140;
+  if (keep || dy < -3) nav.classList.remove('is-hidden');
+  else if (dy > 3) nav.classList.add('is-hidden');
+  if (Math.abs(dy) > 3) lastNavY = y;
+}
 function onScroll() {
   nav.classList.toggle('is-scrolled', window.scrollY > 20);
-  updateNavCurrent();
-  if (flows.stage) flows.stage.setProgress(sceneProgress());
+  updateNavHide();
+  navPill?.sync();
+  const sp = sceneProgress();
+  sceneEl.style.setProperty('--sp', sp.toFixed(3));
+  figure?.refresh();
+  onScrollFx();
+  onScrollPrism();
 }
 let ticking = false;
 window.addEventListener('scroll', () => {
@@ -504,12 +469,57 @@ window.addEventListener('scroll', () => {
 let resizeT;
 window.addEventListener('resize', () => {
   clearTimeout(resizeT);
-  resizeT = setTimeout(() => { setupFlows(); drawLinks(); onScroll(); if (reducedMotion) staticRouter(); }, 120);
+  resizeT = setTimeout(() => { drawLinks(); onScroll(); }, 120);
 });
 
+/* =========================================================
+   3D hero figure (Three.js, loaded on demand)
+   ========================================================= */
+const sceneEl = $('#scene');
+let figure = null;
+async function setupFigure() {
+  try {
+    const { createFigure } = await import('./figure.js');
+    figure = createFigure($('[data-figure]'), {
+      seaAnchor: $('[data-sea-anchor]'),
+      desktopTarget: $('.water-target--desktop'),
+      mobileTarget: $('.water-target--mobile'),
+      reducedMotion,
+    });
+    sceneEl.classList.add('has-figure');
+    figure.refresh();
+  } catch {
+    // The static sea and sphere stay visible on devices without WebGL.
+  }
+}
+
 /* boot */
-setupFlows();
+setupPrism({ reducedMotion });
+// spotlight that follows the cursor across dark sections
+$$('[data-spot]').forEach((el) => {
+  const spot = document.createElement('div');
+  spot.className = 'spot';
+  spot.setAttribute('aria-hidden', 'true');
+  el.prepend(spot);
+  el.addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    const r = el.getBoundingClientRect();
+    el.style.setProperty('--cx', `${e.clientX - r.left}px`);
+    el.style.setProperty('--cy', `${e.clientY - r.top}px`);
+  }, { passive: true });
+});
+if (!reducedMotion) trackProgress($('#platform'), '--pe', { start: 1.05, span: 0.55 });
+setupFigure();
+navPill = setupNavPill($('.nav__links'));
+setupEndingWave();
 applyLang(lang);
+const arrival = new URL(location.href);
+const requestedAgent = arrival.searchParams.get('connect');
+if (AGENT_IDS.includes(requestedAgent)) {
+  openModal('conn', requestedAgent);
+  arrival.searchParams.delete('connect');
+  history.replaceState(null, '', arrival);
+}
 observeReveals();
 onScroll();
 document.fonts?.ready.then(() => { drawLinks(); onScroll(); });

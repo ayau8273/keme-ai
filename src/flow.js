@@ -4,6 +4,7 @@
  * - progress 1: the same ribbons gather on the left (tasks) and split on the right:
  *   three into the agent lane, one into the person lane (section 2)
  * No 3D, no canvas: ~4 paths recalculated per frame while visible.
+ * Pointer: hovering nudges the ribbons, holding the left button pulls them toward the cursor.
  */
 const NS = 'http://www.w3.org/2000/svg';
 const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
@@ -28,9 +29,10 @@ let uid = 0;
 
 /**
  * @param {HTMLElement} root  container; an <svg> is appended to it
- * @param {{ variant?: 'hero'|'band', progress?: number, reducedMotion?: boolean }} opts
+ * @param {{ variant?: 'hero'|'band', progress?: number, reducedMotion?: boolean, zone?: HTMLElement|null }} opts
+ *   zone: element whose pointer events pull the ribbons (null = not interactive)
  */
-export function createFlow(root, { variant = 'hero', progress = 0, reducedMotion = false } = {}) {
+export function createFlow(root, { variant = 'hero', progress = 0, reducedMotion = false, zone = null } = {}) {
   const W = variant === 'band' ? 1440 : 600;
   const H = variant === 'band' ? 300 : 460;
   const ribbons = RIBBONS[variant];
@@ -76,6 +78,10 @@ export function createFlow(root, { variant = 'hero', progress = 0, reducedMotion
   let last = 0;
   const N = variant === 'band' ? 48 : 56;
 
+  // pointer (viewBox-normalised)
+  const ptr = { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5 };
+  let pull = 0, pullT = 0, hold = false, inside = false;
+
   const toPath = (top, bot) => {
     const seg = (pts, start) => {
       let d = start ? `M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}` : `L${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
@@ -105,6 +111,11 @@ export function createFlow(root, { variant = 'hero', progress = 0, reducedMotion
           const w0 = r.w0 * (0.86 + 0.14 * Math.sin(x * 5 + t * 0.6 + i)) * Math.pow(Math.sin(Math.PI * x), 0.55);
           w = lerp(w0, r.w1, p);
         }
+        if (pull > 0.001) {
+          const g = Math.exp(-(((x - ptr.x) / 0.17) ** 2)) * pull;
+          y = lerp(y, ptr.y + (i - 1.5) * 0.035 * (1 - pull * 0.6), g * 0.8);
+          w *= 1 + g * 0.5;
+        }
         top.push([x * W, (y - w / 2) * H]);
         bot.push([x * W, (y + w / 2) * H]);
       }
@@ -120,10 +131,41 @@ export function createFlow(root, { variant = 'hero', progress = 0, reducedMotion
     if (!reducedMotion) t += dt;
     p = lerp(p, target, 1 - Math.pow(0.0005, dt || 0.016));
     if (Math.abs(p - target) < 0.001) p = target;
+    const k = 1 - Math.pow(0.003, dt || 0.016);
+    ptr.x += (ptr.tx - ptr.x) * k;
+    ptr.y += (ptr.ty - ptr.y) * k;
+    pull += (pullT - pull) * (1 - Math.pow(pullT > pull ? 0.002 : 0.05, dt || 0.016));
+    if (Math.abs(pull - pullT) < 0.001) pull = pullT;
     draw();
-    if (visible && (!reducedMotion || p !== target)) raf = requestAnimationFrame(frame);
+    const busy = p !== target || pull !== pullT || Math.abs(ptr.tx - ptr.x) > 0.001;
+    if (visible && (!reducedMotion || busy)) raf = requestAnimationFrame(frame);
   }
   const kick = () => { if (!raf && visible) { last = 0; raf = requestAnimationFrame(frame); } };
+
+  const setPull = () => { pullT = hold ? 1 : inside ? 0.14 : 0; kick(); };
+  const local = (e) => {
+    const r = svg.getBoundingClientRect();
+    // viewBox is letterboxed with "meet": map through the drawn area
+    if (variant === 'band') { ptr.tx = (e.clientX - r.left) / r.width; ptr.ty = (e.clientY - r.top) / r.height; return; }
+    const s = Math.min(r.width / W, r.height / H);
+    ptr.tx = (e.clientX - r.left - (r.width - W * s) / 2) / (W * s);
+    ptr.ty = (e.clientY - r.top - (r.height - H * s) / 2) / (H * s);
+  };
+  const onDown = (e) => {
+    if (e.button !== 0) return;
+    if (!e.target.closest('a, button, input, select, textarea, label')) e.preventDefault();
+    local(e); hold = true; setPull();
+  };
+  const onMove = (e) => { local(e); inside = e.pointerType === 'mouse'; setPull(); };
+  const onLeave = () => { inside = false; setPull(); };
+  const onUp = () => { if (hold) { hold = false; setPull(); } };
+  if (zone) {
+    zone.addEventListener('pointerdown', onDown);
+    zone.addEventListener('pointermove', onMove);
+    zone.addEventListener('pointerleave', onLeave);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+  }
 
   const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible) kick(); });
   io.observe(root);
@@ -134,6 +176,12 @@ export function createFlow(root, { variant = 'hero', progress = 0, reducedMotion
       target = Math.min(1, Math.max(0, v));
       if (reducedMotion) { p = target; draw(); } else kick();
     },
-    destroy() { io.disconnect(); cancelAnimationFrame(raf); svg.remove(); },
+    destroy() {
+      io.disconnect(); cancelAnimationFrame(raf); svg.remove();
+      if (zone) {
+        zone.removeEventListener('pointerdown', onDown); zone.removeEventListener('pointermove', onMove); zone.removeEventListener('pointerleave', onLeave);
+        window.removeEventListener('pointerup', onUp); window.removeEventListener('pointercancel', onUp);
+      }
+    },
   };
 }
