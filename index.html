@@ -3,319 +3,455 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>keme.ai — маркетплейс ИИ-агентов</title>
-  <meta name="description" content="keme.ai — маркетплейс ИИ-агентов для бизнеса в Казахстане. Агенты отвечают клиентам, пишут посты и разбирают резюме. Первая неделя бесплатно." />
-  <meta name="theme-color" content="#f4f7f7" />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230f7d6c'/%3E%3Cpath d='M16 7v13H9z' fill='%23fff'/%3E%3Cpath d='M17.5 10l6 10h-6z' fill='%23fff' opacity='.6'/%3E%3Cpath d='M7 22h18l-2.5 3.5h-13z' fill='%23fff'/%3E%3C/svg%3E" />
+  <title>Keme AI — ИИ-агенты для задач бизнеса</title>
+  <meta name="description" content="Keme AI — маркетплейс ИИ-агентов для бизнеса в Казахстане. Найдите агента под задачу, посмотрите пример его работы и запросите подключение." />
+  <meta name="theme-color" content="#f3f8fc" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cdefs%3E%3ClinearGradient id='f' x1='0' y1='1' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%231656d8'/%3E%3Cstop offset='1' stop-color='%233ae6dc'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg transform='translate(0 7) skewY(-15)'%3E%3Crect x='6' y='12' width='22' height='24' rx='7' fill='%23cfe8fa'/%3E%3Crect x='12' y='16' width='22' height='24' rx='7' fill='%2394c8f8'/%3E%3Crect x='18' y='19' width='26' height='24' rx='7.5' fill='url(%23f)'/%3E%3Crect x='29' y='26.5' width='3.6' height='7' rx='1.8' fill='%23fff'/%3E%3Crect x='36' y='26.5' width='3.6' height='7' rx='1.8' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" /></noscript>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet" /></noscript>
   <link rel="stylesheet" href="/src/style.css" />
 </head>
 <body>
-  <div class="page-glow" aria-hidden="true">
-    <span class="g g1"></span><span class="g g2"></span><span class="g g3"></span>
-  </div>
-  <canvas id="blob" aria-hidden="true"></canvas>
-  <div class="rail" aria-hidden="true"><span class="rail__fill"></span></div>
+  <!-- Brand mark (vector version of public/brand/keme-logo.webp) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="kmFront" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#1656d8"/><stop offset="1" stop-color="#3ae6dc"/></linearGradient>
+      <linearGradient id="kmMid" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#86bff7"/><stop offset="1" stop-color="#b7ddfa"/></linearGradient>
+      <symbol id="keme-mark" viewBox="0 0 48 48">
+        <g transform="translate(0 7) skewY(-15)">
+          <rect x="6" y="12" width="22" height="24" rx="7" fill="#d3ebfa"/>
+          <rect x="12" y="16" width="22" height="24" rx="7" fill="url(#kmMid)"/>
+          <rect x="18" y="19" width="26" height="24" rx="7.5" fill="url(#kmFront)"/>
+          <rect x="29" y="26.5" width="3.6" height="7" rx="1.8" fill="#fff"/>
+          <rect x="36" y="26.5" width="3.6" height="7" rx="1.8" fill="#fff"/>
+        </g>
+      </symbol>
+    </defs>
+  </svg>
 
   <!-- ============ NAV ============ -->
   <header class="nav" id="nav">
     <div class="nav__inner">
-      <a href="#top" class="logo" aria-label="keme.ai">
-        <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true">
-          <rect width="32" height="32" rx="9" fill="currentColor" />
-          <path d="M16 7v13H9z" fill="#fff" />
-          <path d="M17.5 10l6 10h-6z" fill="#fff" opacity=".6" />
-          <path d="M7 22h18l-2.5 3.5h-13z" fill="#fff" />
-        </svg>
-        <span class="logo__word">keme<span>.ai</span></span>
+      <a href="#top" class="logo" aria-label="Keme AI">
+        <svg class="logo__mark" width="34" height="34" aria-hidden="true"><use href="#keme-mark"/></svg>
+        <span class="logo__word">Keme <b>AI</b></span>
       </a>
       <nav class="nav__links" aria-label="Main">
-        <a href="#popular" data-i18n="nav.catalog">Каталог</a>
-        <a href="#how" data-i18n="nav.how">Как это работает</a>
+        <a href="#top" data-i18n="nav.home">Главная</a>
+        <a href="#platform" data-i18n="nav.how">Как работает</a>
+        <a href="#agents" data-i18n="nav.agents">Агенты</a>
         <a href="#developers" data-i18n="nav.dev">Разработчикам</a>
       </nav>
       <div class="nav__right">
         <div class="lang" role="group" aria-label="Language">
           <button type="button" data-lang="ru" class="is-active">Рус</button>
-          <span aria-hidden="true">·</span>
           <button type="button" data-lang="kk">Қаз</button>
-          <span aria-hidden="true">·</span>
           <button type="button" data-lang="en">Eng</button>
         </div>
-        <button type="button" class="nav__login" data-toast data-i18n="nav.login">Войти</button>
-        <a href="#popular" class="btn btn--dark btn--sm" data-i18n="nav.start">Начать</a>
-        <button type="button" class="nav__burger" aria-label="Menu" aria-expanded="false"><span></span><span></span></button>
+        <button type="button" class="nav__login" data-action="login" data-i18n="nav.login">Войти</button>
+        <a href="#agents" class="btn btn--primary btn--sm nav__cta" data-i18n="nav.cta">Найти агента</a>
+        <button type="button" class="nav__burger" aria-label="Menu" aria-expanded="false" aria-controls="navMobile"><span></span><span></span></button>
       </div>
     </div>
-    <div class="nav__mobile">
-      <a href="#popular" data-i18n="nav.catalog">Каталог</a>
-      <a href="#how" data-i18n="nav.how">Как это работает</a>
+    <div class="nav__mobile" id="navMobile">
+      <a href="#top" data-i18n="nav.home">Главная</a>
+      <a href="#platform" data-i18n="nav.how">Как работает</a>
+      <a href="#agents" data-i18n="nav.agents">Агенты</a>
       <a href="#developers" data-i18n="nav.dev">Разработчикам</a>
-      <button type="button" data-toast data-i18n="nav.login">Войти</button>
+      <button type="button" data-action="login" data-i18n="nav.login">Войти</button>
     </div>
   </header>
 
   <main>
-    <!-- ============ HERO ============ -->
-    <section class="hero" id="top" data-blob="below" data-blob-at="0" data-blob-fx="1,0">
-      <div class="hero__inner">
-        <span class="badge" data-reveal data-i18n="hero.badge">Маркетплейс ИИ-агентов · Казахстан</span>
-        <h1 class="display" data-reveal style="--d:.08s" data-i18n-html="hero.title">Бизнес, который<br />работает<br /><em>круглосуточно</em></h1>
-        <p class="hero__lead" data-reveal style="--d:.16s" data-i18n="hero.sub">Маркетплейс готовых ИИ-агентов. Выберите агента под задачу, попробуйте бесплатно и подключите на месяц.</p>
-        <div class="cta-row" data-reveal style="--d:.24s">
-          <a href="#popular" class="btn btn--dark"><span data-i18n="hero.cta1">Найти агента</span>
-            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </a>
-          <a href="#developers" class="btn btn--light" data-i18n="hero.cta2">Опубликовать</a>
-        </div>
-      </div>
-      <div class="blob-zone blob-hit" data-blob-zone aria-hidden="true"></div>
-      <div class="scroll-hint" aria-hidden="true"><i></i><span data-i18n="hero.scroll">Листайте</span></div>
-    </section>
+    <!-- ============ 1–2: HERO + RESULT (one scene) ============ -->
+    <div class="scene" id="scene">
+      <div class="container scene__grid">
+        <div class="scene__text">
+          <section class="hero" id="top">
+            <span class="eyebrow" data-reveal data-i18n="hero.eyebrow">Маркетплейс ИИ-агентов · Казахстан</span>
+            <h1 class="display" data-reveal data-i18n-html="hero.title">ИИ-агенты для задач <em>вашего бизнеса</em></h1>
+            <p class="lead" data-reveal data-i18n="hero.sub">Найдите агента, посмотрите, как он справляется с примером задачи, и запросите подключение.</p>
+            <div class="cta-row" data-reveal>
+              <a href="#agents" class="btn btn--primary"><span data-i18n="hero.cta1">Найти агента</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </a>
+              <button type="button" class="btn btn--secondary" data-open="dev" data-i18n="hero.cta2">Предложить агента</button>
+            </div>
+            <div class="hero__demos" data-reveal>
+              <span data-i18n="hero.demos">Демо-агенты:</span>
+              <a href="#agents" data-i18n="sup.name">ИИ-поддержка</a>
+              <a href="#agents" data-i18n="mkt.name">ИИ-маркетолог</a>
+              <a href="#agents" data-i18n="hr.name">ИИ-HR</a>
+            </div>
+            <div class="flow flow--inline" data-flow="0" aria-hidden="true"></div>
+          </section>
 
-    <!-- ============ WHAT KEME DOES ============ -->
-    <section class="what" id="what" data-blob="fit" data-blob-at="0.12" data-blob-fx="0,1">
-      <div class="sticky">
-        <div class="container what__grid">
-          <div class="what__left">
-            <div class="what__zone blob-hit" data-blob-zone aria-hidden="true"></div>
-            <div class="caption">
-              <span><i class="live"></i><span data-i18n="what.caption">keme core · 3 агента онлайн</span></span>
-              <span class="muted" data-i18n="what.drag">Потяните, чтобы повернуть</span>
+          <section class="result" id="result">
+            <span class="eyebrow" data-reveal data-i18n="res.eyebrow">Что делает агент</span>
+            <h2 class="h2" data-reveal data-i18n="res.title">Агент берёт на себя типовую работу</h2>
+            <p class="lead" data-reveal data-i18n="res.sub">Вы поручаете агенту повторяющуюся задачу. Он выполняет типовую часть, а сложные случаи передаёт человеку.</p>
+            <div class="flow flow--inline flow--route" data-flow="1" aria-hidden="true">
+              <span class="flow__lbl flow__lbl--in" data-i18n="flow.in">Повторяющиеся задачи</span>
+              <span class="flow__lbl flow__lbl--a" data-i18n="flow.agent">Агент — типовая часть</span>
+              <span class="flow__lbl flow__lbl--h" data-i18n="flow.human">Человек — сложные случаи</span>
+            </div>
+            <ol class="examples">
+              <li class="ex" data-reveal>
+                <span class="ex__icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14v10H11l-4 3v-3H5z"/></svg></span>
+                <div class="ex__body">
+                  <h3 data-i18n="ex1.task">Частые вопросы клиентов</h3>
+                  <p><b data-i18n="res.agent">Агент</b><span data-i18n="ex1.a">Отвечает по вашей базе знаний</span></p>
+                  <p class="ex__h"><b data-i18n="res.human">Человеку</b><span data-i18n="ex1.h">Нестандартные обращения</span></p>
+                </div>
+              </li>
+              <li class="ex" data-reveal>
+                <span class="ex__icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4h3l6 4V6L7 10H4zM17 9a4 4 0 0 1 0 6"/></svg></span>
+                <div class="ex__body">
+                  <h3 data-i18n="ex2.task">Посты и контент-план</h3>
+                  <p><b data-i18n="res.agent">Агент</b><span data-i18n="ex2.a">Готовит черновики под нишу</span></p>
+                  <p class="ex__h"><b data-i18n="res.human">Человеку</b><span data-i18n="ex2.h">Финальное утверждение</span></p>
+                </div>
+              </li>
+              <li class="ex" data-reveal>
+                <span class="ex__icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="8" r="3.4"/><path d="M4 19c.8-3.2 3.2-5 6-5s5.2 1.8 6 5M16 11l1.6 1.6L21 9"/></svg></span>
+                <div class="ex__body">
+                  <h3 data-i18n="ex3.task">Первичный разбор резюме</h3>
+                  <p><b data-i18n="res.agent">Агент</b><span data-i18n="ex3.a">Сравнивает резюме с вакансией</span></p>
+                  <p class="ex__h"><b data-i18n="res.human">Человеку</b><span data-i18n="ex3.h">Решение о кандидате</span></p>
+                </div>
+              </li>
+            </ol>
+          </section>
+        </div>
+
+        <div class="scene__visual" aria-hidden="true">
+          <div class="scene__sticky">
+            <div class="flow flow--stage" data-flow="scroll">
+              <span class="flow__lbl flow__lbl--in" data-i18n="flow.in">Повторяющиеся задачи</span>
+              <span class="flow__lbl flow__lbl--a" data-i18n="flow.agent">Агент — типовая часть</span>
+              <span class="flow__lbl flow__lbl--h" data-i18n="flow.human">Человек — сложные случаи</span>
             </div>
           </div>
-          <div class="what__right" data-blob-text>
-            <span class="label" data-i18n="what.label">Что делает keme</span>
-            <p class="words words--xl" data-words data-i18n="what.text">Агенты отвечают клиентам, пишут посты и разбирают резюме. Вы выбираете задачу, а агент делает её каждый день — в любое время и на трёх языках.</p>
-            <div class="stats" data-after-words>
-              <div><strong>24/7</strong><span data-i18n="st1">без выходных и больничных</span></div>
-              <div><strong>3</strong><span data-i18n="st2">языка: қазақ, русский, English</span></div>
-              <div><strong>7</strong><span data-i18n="st3">дней бесплатно на ваших задачах</span></div>
-            </div>
-          </div>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- ============ POPULAR AGENTS ============ -->
-    <section class="popular" id="popular">
-      <canvas class="dots" aria-hidden="true"></canvas>
+    <!-- ============ 3: PLATFORM ============ -->
+    <section class="platform" id="platform">
       <div class="container">
-        <div class="popular__head">
-          <div>
-            <span class="label label--light" data-reveal data-i18n="pop.label">Популярное</span>
-            <h2 class="h2" data-reveal data-i18n="pop.title">Агенты, которые уже работают</h2>
-            <p class="popular__sub" data-reveal data-i18n="pop.sub">Первая неделя — бесплатно. Подключите агента и проверьте его на своих задачах.</p>
+        <div class="section-head section-head--center">
+          <span class="eyebrow eyebrow--light" data-reveal data-i18n="pl.eyebrow">Как работает</span>
+          <h2 class="h2" data-reveal data-i18n="pl.title">Keme AI соединяет разработчиков агентов и бизнес</h2>
+        </div>
+        <div class="pscheme" id="pscheme">
+          <svg class="plinks" id="plinks" aria-hidden="true"></svg>
+          <div class="pcol" data-side="dev">
+            <h3 class="pcol__title" data-i18n="pl.dev">Разработчикам</h3>
+            <article class="pcard" data-reveal data-link="dev-0">
+              <span class="pcard__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span>
+              <div><span class="pcard__n">01</span><h4 data-i18n="pd1.t">Предложите агента</h4><p data-i18n="pd1.d">Укажите задачу, возможности и способ запуска.</p></div>
+            </article>
+            <article class="pcard" data-reveal data-link="dev-1">
+              <span class="pcard__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l2.5 2.5L16 9"/><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/></svg></span>
+              <div><span class="pcard__n">02</span><h4 data-i18n="pd2.t">Пройдите рассмотрение</h4><p data-i18n="pd2.d">Команда Keme AI изучит заявку и свяжется с вами.</p></div>
+            </article>
+            <article class="pcard" data-reveal data-link="dev-2">
+              <span class="pcard__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3 3-5 6-5s5.4 2 6 5M16 5.5a3.2 3.2 0 0 1 0 5.6M18.5 14.5c1.4.8 2.3 2.4 2.5 4.5"/></svg></span>
+              <div><span class="pcard__n">03</span><h4 data-i18n="pd3.t">Найдите клиентов</h4><p data-i18n="pd3.d">Бизнес находит агента и отправляет запрос на подключение.</p></div>
+            </article>
           </div>
-          <a href="#areas" class="btn btn--ghost" data-reveal><span data-i18n="pop.all">Весь каталог</span>
-            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </a>
+
+          <div class="phub" data-reveal>
+            <div class="phub__core" id="phub">
+              <svg width="64" height="64" aria-hidden="true"><use href="#keme-mark"/></svg>
+              <strong>Keme AI</strong>
+              <span data-i18n="pl.hub">Платформа ИИ-агентов</span>
+            </div>
+          </div>
+
+          <div class="pcol" data-side="biz">
+            <h3 class="pcol__title" data-i18n="pl.biz">Бизнесу</h3>
+            <article class="pcard" data-reveal data-link="biz-0">
+              <span class="pcard__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg></span>
+              <div><span class="pcard__n">01</span><h4 data-i18n="pb1.t">Найдите агента</h4><p data-i18n="pb1.d">Подберите его под конкретную задачу.</p></div>
+            </article>
+            <article class="pcard" data-reveal data-link="biz-1">
+              <span class="pcard__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 5.5v13l10.5-6.5z"/></svg></span>
+              <div><span class="pcard__n">02</span><h4 data-i18n="pb2.t">Попробуйте демо</h4><p data-i18n="pb2.d">Посмотрите, как работает демо-агент.</p></div>
+            </article>
+            <article class="pcard" data-reveal data-link="biz-2">
+              <span class="pcard__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l16-8-6 16-2.5-6.5z"/></svg></span>
+              <div><span class="pcard__n">03</span><h4 data-i18n="pb3.t">Запросите подключение</h4><p data-i18n="pb3.d">Отправьте заявку на использование агента.</p></div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 4: ONE AGENT, BOTH SIDES ============ -->
+    <section class="journey" id="journey">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow" data-reveal data-i18n="jr.eyebrow">Пример</span>
+          <h2 class="h2" data-reveal data-i18n="jr.title">Один агент — с двух сторон платформы</h2>
+          <p class="lead" data-reveal data-i18n="jr.sub">Путь демо-агента поддержки: от разработчика до бизнеса.</p>
+        </div>
+        <div class="jr" id="jr" data-reveal>
+          <div class="jr__lanes" aria-hidden="true">
+            <span class="lane lane--dev" data-i18n="jr.lane.dev">Разработчик</span>
+            <span class="lane lane--hub">Keme AI</span>
+            <span class="lane lane--biz" data-i18n="jr.lane.biz">Бизнес</span>
+          </div>
+          <div class="jr__steps" role="tablist" aria-label="Steps">
+            <span class="jr__track" aria-hidden="true"><i id="jrFill"></i></span>
+            <button type="button" role="tab" class="jstep" data-step="0"><span>1</span><b data-i18n="js1.t">Предлагает агента</b></button>
+            <button type="button" role="tab" class="jstep" data-step="1"><span>2</span><b data-i18n="js2.t">Показывает демо</b></button>
+            <button type="button" role="tab" class="jstep" data-step="2"><span>3</span><b data-i18n="js3.t">Выбирает агента</b></button>
+            <button type="button" role="tab" class="jstep" data-step="3"><span>4</span><b data-i18n="js4.t">Задаёт задачу</b></button>
+            <button type="button" role="tab" class="jstep" data-step="4"><span>5</span><b data-i18n="js5.t">Видит результат</b></button>
+            <button type="button" role="tab" class="jstep" data-step="5"><span>6</span><b data-i18n="js6.t">Запрашивает подключение</b></button>
+          </div>
+          <div class="jr__stage" role="tabpanel" aria-live="polite">
+            <div class="jr__text">
+              <span class="jr__who" id="jrWho"></span>
+              <h3 id="jrTitle"></h3>
+              <p id="jrDesc"></p>
+            </div>
+            <div class="jr__mock">
+              <span class="tag tag--example" data-i18n="jr.tag">Пример</span>
+              <!-- 1: developer application -->
+              <div class="mock" data-mock="0">
+                <div class="mock__head" data-i18n="mk.app">Заявка разработчика</div>
+                <dl class="mock__fields">
+                  <div><dt data-i18n="mk.agent">Агент</dt><dd data-i18n="sup.name">ИИ-поддержка</dd></div>
+                  <div><dt data-i18n="mk.task">Задача</dt><dd data-i18n="mk.taskv">Ответы клиентам по базе знаний</dd></div>
+                  <div><dt data-i18n="mk.launch">Запуск</dt><dd data-i18n="mk.launchv">Виджет на сайте</dd></div>
+                </dl>
+                <span class="mock__btn" data-i18n="mk.send">Отправить заявку</span>
+              </div>
+              <!-- 2: catalog card -->
+              <div class="mock" data-mock="1">
+                <div class="mock__head" data-i18n="mk.catalog">Каталог Keme AI</div>
+                <div class="mrow mrow--card">
+                  <span class="mrow__icon">S</span>
+                  <div><b data-i18n="sup.name">ИИ-поддержка</b><small data-i18n="sup.task">Отвечает клиентам по вашей базе знаний или FAQ.</small></div>
+                  <span class="pill" data-i18n="mk.demo">Демо</span>
+                </div>
+              </div>
+              <!-- 3: pick the agent -->
+              <div class="mock" data-mock="2">
+                <div class="mock__head" data-i18n="mk.catalog">Каталог Keme AI</div>
+                <div class="mrow is-picked"><span class="mrow__icon">S</span><b data-i18n="sup.name">ИИ-поддержка</b><span class="mrow__check" aria-hidden="true">✓</span></div>
+                <div class="mrow is-dim"><span class="mrow__icon">M</span><b data-i18n="mkt.name">ИИ-маркетолог</b></div>
+                <div class="mrow is-dim"><span class="mrow__icon">H</span><b data-i18n="hr.name">ИИ-HR</b></div>
+              </div>
+              <!-- 4: ask -->
+              <div class="mock" data-mock="3">
+                <div class="mock__head"><span data-i18n="sup.name">ИИ-поддержка</span> · <span data-i18n="mk.demo">Демо</span></div>
+                <div class="mbubble mbubble--user" data-i18n="mk.ask">Можно вернуть товар без чека?</div>
+                <div class="minput"><span data-i18n="mk.typing">Напишите вопрос…</span><i aria-hidden="true">↑</i></div>
+              </div>
+              <!-- 5: result -->
+              <div class="mock" data-mock="4">
+                <div class="mock__head"><span data-i18n="sup.name">ИИ-поддержка</span> · <span data-i18n="mk.demo">Демо</span></div>
+                <div class="mbubble mbubble--user" data-i18n="mk.ask">Можно вернуть товар без чека?</div>
+                <div class="mbubble mbubble--agent" data-i18n="mk.answer"></div>
+                <span class="pill pill--human" data-i18n="mk.handoff">Сложный случай → менеджер</span>
+              </div>
+              <!-- 6: request -->
+              <div class="mock" data-mock="5">
+                <div class="mock__head" data-i18n="mk.request">Запросить подключение</div>
+                <dl class="mock__fields">
+                  <div><dt data-i18n="mk.agent">Агент</dt><dd data-i18n="sup.name">ИИ-поддержка</dd></div>
+                  <div><dt data-i18n="mk.company">Компания</dt><dd data-i18n="mk.companyv">Ваша компания</dd></div>
+                </dl>
+                <span class="mock__btn mock__btn--done"><span aria-hidden="true">✓</span> <span data-i18n="mk.sent">Заявка отправлена</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 5: WHY ============ -->
+    <section class="why" id="why">
+      <div class="container why__grid">
+        <div>
+          <span class="eyebrow" data-reveal data-i18n="why.eyebrow">Зачем бизнесу агент</span>
+          <h2 class="h2" data-reveal data-i18n="why.title">Типовое — агенту, сложное — команде</h2>
+          <ul class="benefits">
+            <li data-reveal><span class="benefits__n">1</span><div><h3 data-i18n="w1.t">Поручите повторяющуюся задачу</h3><p data-i18n="w1.d"></p></div></li>
+            <li data-reveal><span class="benefits__n">2</span><div><h3 data-i18n="w2.t">Типовые запросы — без очереди</h3><p data-i18n="w2.d"></p></div></li>
+            <li data-reveal><span class="benefits__n">3</span><div><h3 data-i18n="w3.t">Сложное — под контролем человека</h3><p data-i18n="w3.d"></p></div></li>
+          </ul>
+          <p class="note" data-reveal data-i18n="why.note">Агент может ошибаться, поэтому на старте результаты стоит проверять.</p>
+        </div>
+        <div class="router" id="router" data-reveal aria-hidden="true">
+          <span class="tag tag--example" data-i18n="jr.tag">Пример</span>
+          <div class="router__col router__col--in"><span class="router__lbl" data-i18n="rt.in">Входящие запросы</span></div>
+          <div class="router__hub"><svg width="40" height="40"><use href="#keme-mark"/></svg></div>
+          <div class="router__col router__col--out">
+            <div class="router__lane router__lane--a"><span class="router__lbl" data-i18n="rt.a">Типовой → агент</span></div>
+            <div class="router__lane router__lane--h"><span class="router__lbl" data-i18n="rt.h">Сложный → человек</span></div>
+          </div>
+          <svg class="router__lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M30 50 C 40 50, 40 50, 50 50" />
+            <path d="M50 50 C 60 50, 60 30, 70 30" />
+            <path d="M50 50 C 60 50, 60 76, 70 76" class="h" />
+          </svg>
+          <div class="router__chips" id="routerChips"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 6: DEMO AGENTS ============ -->
+    <section class="agents" id="agents">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow" data-reveal data-i18n="ag.eyebrow">Агенты</span>
+          <h2 class="h2" data-reveal data-i18n="ag.title">Демо-агенты команды Keme AI</h2>
+          <p class="lead" data-reveal data-i18n="ag.sub"></p>
         </div>
         <div class="acards" id="agentCards"><!-- rendered by main.js --></div>
       </div>
     </section>
 
-    <!-- ============ AT WORK (infographics) ============ -->
-    <section class="work" id="work">
+    <!-- ============ 7: AGENT IN ACTION ============ -->
+    <section class="action" id="action">
       <div class="container">
-        <div class="section-head">
-          <span class="label" data-reveal data-i18n="work.label">В работе</span>
-          <h2 class="h2" data-reveal data-i18n="work.title">Как это выглядит на практике</h2>
+        <div class="action__head">
+          <div class="section-head">
+            <span class="eyebrow" data-reveal data-i18n="ac.eyebrow">Агент в действии</span>
+            <h2 class="h2" data-reveal data-i18n="ac.title">Задача → действия агента → результат</h2>
+          </div>
+          <div class="seg" role="tablist" id="acTabs" data-reveal>
+            <button type="button" role="tab" data-agent="sup" data-i18n="sup.name">ИИ-поддержка</button>
+            <button type="button" role="tab" data-agent="mkt" data-i18n="mkt.name">ИИ-маркетолог</button>
+            <button type="button" role="tab" data-agent="hr" data-i18n="hr.name">ИИ-HR</button>
+          </div>
         </div>
-
-        <!-- Night shift: support agent -->
-        <article class="ig ig--night" id="night" data-reveal>
-          <header class="ig__head">
-            <div>
-              <span class="label label--sm" data-i18n="n.tag">Для бизнеса · ИИ-поддержка</span>
-              <h3 class="ig__title" data-i18n="n.title">Ночная смена без новых сотрудников</h3>
+        <div class="demo" id="demo" data-reveal>
+          <div class="demo__bar">
+            <span class="tag tag--example" data-i18n="ac.label">Иллюстрация работы</span>
+            <span class="demo__note" data-i18n="ac.note">Это заранее подготовленный пример, а не живой вызов ИИ.</span>
+          </div>
+          <div class="demo__grid">
+            <div class="demo__col">
+              <span class="demo__lbl" data-i18n="ac.input">Входная задача</span>
+              <p class="demo__in" id="demoIn"></p>
             </div>
-            <span class="ig__ex" data-i18n="ig.example">Пример</span>
-          </header>
-          <div class="night">
-            <div class="night__stat">
-              <div class="bignum" data-of="35,37"></div>
-              <p data-i18n="n.desc">вопросов закрыл агент, пока вы спали. 2 ждут вас утром.</p>
-              <div class="legend">
-                <span><i class="lg lg--a"></i><span data-i18n="n.leg1">ответил агент</span></span>
-                <span><i class="lg lg--h"></i><span data-i18n="n.leg2">передал вам</span></span>
-              </div>
+            <div class="demo__col">
+              <span class="demo__lbl" data-i18n="ac.steps">Что делает агент</span>
+              <ol class="demo__steps" id="demoSteps"></ol>
             </div>
-            <div class="night__viz">
-              <div class="timeline" id="timeline" role="group" aria-label="21:00–09:00">
-                <span class="timeline__sweep" aria-hidden="true"></span>
-              </div>
-              <div class="axis" aria-hidden="true"><span>21:00</span><span>23:00</span><span>01:00</span><span>03:00</span><span>05:00</span><span>07:00</span><span>09:00</span></div>
-              <div class="chat" aria-live="polite">
-                <span class="chat__time mono" id="chatTime">23:05</span>
-                <span class="chat__role" data-i18n="n.client">Клиент</span>
-                <span class="chat__msg" id="chatQ"></span>
-                <span></span>
-                <span class="chat__role" data-i18n="n.agent">Агент</span>
-                <span class="chat__msg chat__msg--a"><span id="chatA"></span> <small id="chatMeta"></small></span>
-              </div>
+            <div class="demo__col demo__col--out">
+              <span class="demo__lbl" data-i18n="ac.result">Результат</span>
+              <p class="demo__out" id="demoOut"></p>
+              <small class="demo__foot" id="demoFoot"></small>
             </div>
           </div>
-          <footer class="ig__foot">
-            <span data-i18n="n.foot">7 дней бесплатно — завтра утром увидите свою ночь.</span>
-            <a href="#popular" class="link"><span data-i18n="hero.cta1">Найти агента</span> →</a>
-          </footer>
-        </article>
-
-        <div class="ig-row">
-          <!-- Content week: marketer -->
-          <article class="ig" id="week" data-reveal>
-            <header class="ig__head">
-              <div>
-                <span class="label label--sm" data-i18n="m.tag">Маркетинг · ИИ-маркетолог</span>
-                <h3 class="ig__title" data-i18n="m.title">Неделя контента за 2 минуты</h3>
-              </div>
-              <span class="ig__ex" data-i18n="ig.example">Пример</span>
-            </header>
-            <div class="week__top">
-              <div class="bignum bignum--md"><span data-count="12">0</span></div>
-              <p data-i18n="m.desc">публикаций на неделю по одному запросу: ниша, продукт, аудитория.</p>
-            </div>
-            <div class="week-wrap"><div class="week" id="weekGrid"></div></div>
-            <footer class="ig__foot">
-              <div class="types" id="weekTypes"></div>
-              <button type="button" class="link" id="weekRegen">
-                <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2.5v3h-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <span data-i18n="m.regen">Сгенерировать заново</span>
-              </button>
-            </footer>
-          </article>
-
-          <!-- Resume screening: HR -->
-          <article class="ig" id="hrviz" data-reveal>
-            <header class="ig__head">
-              <div>
-                <span class="label label--sm" data-i18n="h.tag">HR · ИИ-HR</span>
-                <h3 class="ig__title" data-i18n="h.title">50 резюме — 5 интервью</h3>
-              </div>
-              <span class="ig__ex" data-i18n="ig.example">Пример</span>
-            </header>
-            <div class="week__top">
-              <div class="bignum bignum--md" data-of="5,50"></div>
-              <p data-i18n="h.desc">кандидатов с совпадением выше 75% — уже с вопросами для интервью.</p>
-            </div>
-            <div class="hr">
-              <div class="hr__grid" id="hrGrid" aria-hidden="true"></div>
-              <ol class="hr__list" id="hrList"></ol>
-            </div>
-            <footer class="ig__foot">
-              <span class="note"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5l5.5 2v4c0 3.5-2.4 6-5.5 7-3.1-1-5.5-3.5-5.5-7v-4z" fill="none" stroke="currentColor" stroke-width="1.4"/></svg><span data-i18n="h.note">Решение о кандидате всегда принимает человек.</span></span>
-            </footer>
-          </article>
+          <div class="demo__actions">
+            <button type="button" class="btn btn--ghost btn--sm" id="demoReplay">
+              <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2.5v3h-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span data-i18n="ac.replay">Показать снова</span>
+            </button>
+            <span id="demoCta"></span>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- ============ HOW ============ -->
-    <section class="how" id="how">
-      <div class="container">
-        <div class="how__head">
-          <div>
-            <span class="label" data-reveal data-i18n="how.label">Как это работает</span>
-            <h2 class="h2" data-reveal data-i18n="how.title">От задачи до работающего агента — за пару минут</h2>
-          </div>
-          <div class="tabs" role="tablist" data-reveal>
-            <span class="tabs__pill" aria-hidden="true"></span>
-            <button role="tab" type="button" class="is-active" aria-selected="true" data-tab="biz" data-i18n="how.tab.biz">Для бизнеса</button>
-            <button role="tab" type="button" aria-selected="false" data-tab="dev" data-i18n="how.tab.dev">Для разработчиков</button>
-          </div>
-        </div>
-        <div class="steps-wrap">
-          <ol class="steps is-active" data-panel="biz">
-            <li><span class="mono">01</span><h3 data-i18n="b1.t">Найдите</h3><p data-i18n="b1.d">Агента по сфере: маркетинг, продажи, поддержка, HR, финансы и другие.</p></li>
-            <li><span class="mono">02</span><h3 data-i18n="b2.t">Сравните</h3><p data-i18n="b2.d">Рейтинги, отзывы, число подписчиков и цены.</p></li>
-            <li><span class="mono">03</span><h3 data-i18n="b3.t">Попробуйте</h3><p data-i18n="b3.d">7 дней бесплатно, на ваших реальных задачах.</p></li>
-            <li><span class="mono">04</span><h3 data-i18n="b4.t">Подпишитесь</h3><p data-i18n="b4.d">Помесячно. Отмена в любой момент.</p></li>
-          </ol>
-          <ol class="steps" data-panel="dev">
-            <li><span class="mono">01</span><h3 data-i18n="d1.t">Опубликуйте</h3><p data-i18n="d1.d">Готового агента с описанием, возможностями и языками.</p></li>
-            <li><span class="mono">02</span><h3 data-i18n="d2.t">Назначьте цену</h3><p data-i18n="d2.d">Свою ежемесячную цену в тенге.</p></li>
-            <li><span class="mono">03</span><h3 data-i18n="d3.t">Запускайтесь</h3><p data-i18n="d3.d">Сразу, без очереди на модерацию.</p></li>
-            <li><span class="mono">04</span><h3 data-i18n="d4.t">Зарабатывайте</h3><p data-i18n="d4.d">95% каждой подписки. Растите за счёт рейтинга.</p></li>
-          </ol>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ AREAS ============ -->
+    <!-- ============ 8: AREAS ============ -->
     <section class="areas" id="areas">
       <div class="container">
         <div class="section-head">
-          <span class="label" data-reveal data-i18n="ar.label">Сферы</span>
-          <h2 class="h2" data-reveal data-i18n="ar.title">Агент для любой задачи</h2>
+          <span class="eyebrow" data-reveal data-i18n="ar.eyebrow">Направления</span>
+          <h2 class="h2" data-reveal data-i18n="ar.title">Найдите агента под свою задачу</h2>
         </div>
-        <div class="areas__grid" id="areasGrid"><!-- rendered by main.js --></div>
+        <div class="areas__group">
+          <span class="areas__tier" data-i18n="ar.live">Есть демо</span>
+          <div class="areas__live" id="areasLive"></div>
+        </div>
+        <div class="areas__group">
+          <span class="areas__tier areas__tier--soon" data-i18n="ar.soon">Скоро</span>
+          <ul class="areas__soon" id="areasSoon"></ul>
+          <p class="areas__offer"><span data-i18n="ar.offer">Есть агент для другого направления?</span>
+            <button type="button" class="link" data-open="dev"><span data-i18n="ar.offerBtn">Предложите его</span> →</button></p>
+        </div>
       </div>
     </section>
 
-    <!-- ============ DEVELOPERS ============ -->
-    <section class="model" id="developers">
-      <div class="container">
-        <span class="label label--light" data-reveal data-i18n="dev.label">Разработчикам</span>
-        <h2 class="h2 model__title" data-reveal data-i18n="dev.title">Публикуйте агента и получайте 95% каждой подписки</h2>
-        <div class="split" data-reveal>
-          <div class="split__bar"><span class="split__dev"></span><span class="split__us"></span></div>
-          <div class="split__cols">
-            <div class="split__col">
-              <div class="split__num"><span data-count="95">0</span>%</div>
-              <h3 data-i18n="dev.you.t">Вам</h3>
-              <p data-i18n="dev.you.d">Клиенты, платежи и публичный рейтинг — без своей инфраструктуры</p>
+    <!-- ============ 9: HOW TO CHOOSE ============ -->
+    <section class="choose" id="choose">
+      <div class="container choose__grid">
+        <div class="choose__card" data-reveal>
+          <span class="tag tag--example" data-i18n="ch.sample">Пример карточки</span>
+          <div class="scard">
+            <div class="scard__head">
+              <span class="scard__icon" aria-hidden="true">S</span>
+              <div><b data-i18n="sup.name">ИИ-поддержка</b><small data-i18n="sup.cat">Поддержка клиентов</small></div>
+              <span class="pill" data-i18n="mk.demo">Демо</span>
             </div>
-            <div class="split__col split__col--us">
-              <div class="split__num"><span data-count="5">0</span>%</div>
-              <h3>keme.ai</h3>
-              <p data-i18n="dev.us.d">Каталог, оплата в тенге, поддержка и пробный период</p>
-            </div>
+            <dl class="scard__rows">
+              <div><dt><i class="marker">1</i><span data-i18n="sc.task">Задача</span></dt><dd data-i18n="sc.taskv"></dd></div>
+              <div><dt><i class="marker">2</i><span data-i18n="sc.result">Результат в демо</span></dt><dd data-i18n="sc.resultv"></dd></div>
+              <div><dt><span data-i18n="sc.langs">Языки</span></dt><dd>Қаз · Рус · Eng</dd></div>
+              <div><dt><span data-i18n="sc.human">Сложные случаи</span></dt><dd data-i18n="sc.humanv"></dd></div>
+            </dl>
+            <span class="scard__btn"><i class="marker">3</i><span data-i18n="ag.request">Запросить подключение</span></span>
           </div>
         </div>
-        <div class="model__grid">
-          <ul class="model__list" data-reveal>
-            <li data-i18n="dev.f1">Публикация без очереди на модерацию — агент сразу в каталоге</li>
-            <li data-i18n="dev.f2">Цену в тенге назначаете вы, подписки списываются автоматически</li>
-            <li data-i18n="dev.f3">Отзывы оставляют только платящие подписчики — рейтинг честный</li>
-            <li data-i18n="dev.f4">Чем выше рейтинг, тем выше агент в выдаче</li>
-          </ul>
-          <form class="calc" data-reveal onsubmit="return false">
-            <div class="calc__head"><span class="mono" data-i18n="calc.title">Посчитайте доход</span><span class="calc__tag mono">₸</span></div>
-            <label class="calc__field">
-              <span><span data-i18n="calc.price">Цена подписки</span><output id="outPrice">15 000 ₸</output></span>
-              <input type="range" id="inPrice" min="2000" max="100000" step="1000" value="15000" />
-            </label>
-            <label class="calc__field">
-              <span><span data-i18n="calc.subs">Подписчики</span><output id="outSubs">40</output></span>
-              <input type="range" id="inSubs" min="1" max="500" step="1" value="40" />
-            </label>
-            <div class="calc__result">
-              <span data-i18n="calc.you">Вы получаете в месяц</span>
-              <strong id="outYou">570 000 ₸</strong>
-              <small><span data-i18n="calc.fee">Комиссия keme.ai 5%</span>: <span id="outFee">30 000 ₸</span></small>
-            </div>
-          </form>
+        <div>
+          <span class="eyebrow" data-reveal data-i18n="ch.eyebrow">Как выбрать агента</span>
+          <h2 class="h2" data-reveal data-i18n="ch.title">Три вопроса перед подключением</h2>
+          <ol class="qs">
+            <li data-reveal><i class="marker">1</i><div><h3 data-i18n="c1.t"></h3><p data-i18n="c1.d"></p></div></li>
+            <li data-reveal><i class="marker">2</i><div><h3 data-i18n="c2.t"></h3><p data-i18n="c2.d"></p></div></li>
+            <li data-reveal><i class="marker">3</i><div><h3 data-i18n="c3.t"></h3><p data-i18n="c3.d"></p></div></li>
+          </ol>
         </div>
       </div>
     </section>
 
-    <!-- ============ FINAL CTA ============ -->
-    <section class="final" id="final" data-blob="below" data-blob-at="0.5" data-blob-fx="1,0">
-      <div class="final__inner">
-        <h2 class="display display--md" data-reveal data-i18n-html="fin.title">Первая неделя —<br /><em>бесплатно</em></h2>
-        <p class="hero__lead" data-reveal style="--d:.06s" data-i18n="fin.sub">Выберите агента под задачу и проверьте его на своих данных.</p>
-        <div class="cta-row" data-reveal style="--d:.12s">
-          <a href="#popular" class="btn btn--dark"><span data-i18n="hero.cta1">Найти агента</span>
-            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </a>
-          <a href="#developers" class="btn btn--light" data-i18n="ft.publish">Опубликовать агента</a>
+    <!-- ============ 10: DEVELOPERS ============ -->
+    <section class="dev" id="developers">
+      <div class="container">
+        <div class="devbox" data-reveal>
+          <div class="devbox__head">
+            <div>
+              <span class="eyebrow" data-i18n="dv.eyebrow">Разработчикам</span>
+              <h2 class="h2" data-i18n="dv.title">Предложите своего агента</h2>
+              <p class="lead" data-i18n="dv.sub"></p>
+            </div>
+            <button type="button" class="btn btn--primary" data-open="dev"><span data-i18n="dv.cta">Предложить агента</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+          <ol class="dsteps">
+            <li><span>01</span><h3 data-i18n="d1.t"></h3><p data-i18n="d1.d"></p></li>
+            <li><span>02</span><h3 data-i18n="d2.t"></h3><p data-i18n="d2.d"></p></li>
+            <li><span>03</span><h3 data-i18n="d3.t"></h3><p data-i18n="d3.d"></p></li>
+            <li><span>04</span><h3 data-i18n="d4.t"></h3><p data-i18n="d4.d"></p></li>
+          </ol>
         </div>
       </div>
-      <div class="blob-zone blob-hit" data-blob-zone aria-hidden="true"></div>
+    </section>
+
+    <!-- ============ 11: FINAL ============ -->
+    <section class="final" id="final">
+      <div class="container final__inner">
+        <h2 class="display display--md" data-reveal data-i18n-html="fn.title">Начните с одной <em>повторяющейся задачи</em></h2>
+        <p class="lead" data-reveal data-i18n="fn.sub">Посмотрите демо-агентов или предложите своего.</p>
+        <div class="cta-row cta-row--center" data-reveal>
+          <a href="#agents" class="btn btn--primary"><span data-i18n="fn.cta1">Перейти к агентам</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <button type="button" class="btn btn--secondary" data-open="dev" data-i18n="fn.cta2">Предложить агента</button>
+        </div>
+      </div>
+      <div class="flow flow--band" data-flow="band" aria-hidden="true"></div>
     </section>
   </main>
 
@@ -324,74 +460,85 @@
     <div class="container">
       <div class="footer__top">
         <div class="footer__brand">
-          <a href="#top" class="logo logo--light" aria-label="keme.ai">
-            <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true">
-              <rect width="32" height="32" rx="9" fill="currentColor" />
-              <path d="M16 7v13H9z" fill="#fff" />
-              <path d="M17.5 10l6 10h-6z" fill="#fff" opacity=".6" />
-              <path d="M7 22h18l-2.5 3.5h-13z" fill="#fff" />
-            </svg>
-            <span class="logo__word">keme<span>.ai</span></span>
+          <a href="#top" class="logo logo--light" aria-label="Keme AI">
+            <svg class="logo__mark" width="34" height="34" aria-hidden="true"><use href="#keme-mark"/></svg>
+            <span class="logo__word">Keme <b>AI</b></span>
           </a>
-          <p data-i18n="ft.tag">Маркетплейс ИИ-агентов для бизнеса Казахстана.</p>
+          <p data-i18n="ft.tag">Маркетплейс ИИ-агентов для бизнеса в Казахстане.</p>
         </div>
         <div class="footer__cols">
           <div>
-            <h4 data-i18n="ft.product">Продукт</h4>
-            <a href="#popular" data-i18n="nav.catalog">Каталог</a>
-            <a href="#areas" data-i18n="ar.label">Сферы</a>
-            <a href="#how" data-i18n="nav.how">Как это работает</a>
+            <h4 data-i18n="ft.nav">Разделы</h4>
+            <a href="#top" data-i18n="nav.home">Главная</a>
+            <a href="#platform" data-i18n="nav.how">Как работает</a>
+            <a href="#agents" data-i18n="nav.agents">Агенты</a>
+            <a href="#areas" data-i18n="ft.areas">Направления</a>
+            <a href="#developers" data-i18n="nav.dev">Разработчикам</a>
           </div>
           <div>
-            <h4 data-i18n="nav.dev">Разработчикам</h4>
-            <a href="#developers" data-i18n="ft.publish">Опубликовать агента</a>
-            <a href="#developers" data-i18n="ft.calc">Калькулятор дохода</a>
-            <button type="button" data-toast data-i18n="ft.docs">Документация</button>
-          </div>
-          <div>
-            <h4 data-i18n="ft.help">Помощь</h4>
-            <button type="button" data-toast data-i18n="ft.contact">Контакты</button>
-            <button type="button" data-toast data-i18n="ft.terms">Условия использования</button>
-            <button type="button" data-toast data-i18n="ft.privacy">Конфиденциальность</button>
+            <h4 data-i18n="ft.actions">Действия</h4>
+            <a href="#agents" data-i18n="ft.find">Найти агента</a>
+            <button type="button" data-open="conn" data-i18n="ft.connect">Запросить подключение</button>
+            <button type="button" data-open="dev" data-i18n="ft.offer">Предложить агента</button>
           </div>
         </div>
       </div>
-      <div class="footer__word" aria-hidden="true">keme</div>
-      <div class="footer__bottom mono">
-        <span>© 2026 keme.ai</span>
-        <span data-i18n="ft.made">Сделано в Казахстане</span>
-      </div>
+      <div class="footer__bottom"><span>© 2026 Keme AI</span></div>
     </div>
   </footer>
 
-  <!-- ============ DEMO MODAL ============ -->
+  <!-- ============ FORMS (modal) ============ -->
   <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
     <div class="modal__backdrop" data-close></div>
     <div class="modal__panel">
-      <div class="modal__head">
-        <div class="modal__id">
-          <span class="agent-icon" id="modalIcon"></span>
-          <div>
-            <h3 id="modalTitle">—</h3>
-            <span class="mono modal__demo" data-i18n="modal.demo">Демо · без регистрации</span>
-          </div>
+      <button type="button" class="modal__x" data-close aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+
+      <form class="form" id="formDev" data-form="dev" novalidate>
+        <h3 class="form__title" id="modalTitle" data-i18n="f.dev.title">Предложить агента</h3>
+        <p class="form__sub" data-i18n="f.dev.sub"></p>
+        <div class="form__grid">
+          <label class="field"><span data-i18n="f.name"></span><input name="name" autocomplete="name" required /></label>
+          <label class="field"><span data-i18n="f.contact"></span><input name="contact" autocomplete="email" required data-type="contact" /></label>
+          <label class="field field--wide"><span data-i18n="f.agentName"></span><input name="agentName" required /></label>
+          <label class="field field--wide"><span data-i18n="f.task"></span><textarea name="task" rows="2" required></textarea></label>
+          <label class="field field--wide"><span><span data-i18n="f.capabilities"></span> <em data-i18n="f.optional"></em></span><textarea name="capabilities" rows="2"></textarea></label>
+          <label class="field"><span data-i18n="f.launch"></span>
+            <select name="launch" required id="launchSelect"></select>
+          </label>
+          <fieldset class="field field--checks" data-group="languages">
+            <legend data-i18n="f.langs"></legend>
+            <label><input type="checkbox" name="languages" value="kk" checked /> Қаз</label>
+            <label><input type="checkbox" name="languages" value="ru" checked /> Рус</label>
+            <label><input type="checkbox" name="languages" value="en" /> Eng</label>
+          </fieldset>
         </div>
-        <button type="button" class="modal__x" data-close aria-label="Close">
-          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-        </button>
-      </div>
-      <label class="modal__label mono" for="modalInput" data-i18n="modal.input">Ваш запрос</label>
-      <textarea id="modalInput" rows="3"></textarea>
-      <div class="modal__actions">
-        <button type="button" class="btn btn--dark btn--sm" id="modalRun"><span data-i18n="modal.run">Запустить</span></button>
-      </div>
-      <div class="modal__out" aria-live="polite">
-        <span class="modal__label mono" data-i18n="modal.output">Ответ агента</span>
-        <div class="modal__text" id="modalOut"></div>
-      </div>
-      <div class="modal__foot">
-        <span id="modalPrice"></span>
-        <button type="button" class="btn btn--light btn--sm" data-toast data-i18n="modal.subscribe">Подключить</button>
+        <button type="submit" class="btn btn--primary form__submit" data-i18n="f.submit.dev">Отправить заявку</button>
+      </form>
+
+      <form class="form" id="formConn" data-form="conn" novalidate>
+        <h3 class="form__title" id="modalTitleConn" data-i18n="f.conn.title">Запросить подключение</h3>
+        <p class="form__sub" data-i18n="f.conn.sub"></p>
+        <div class="form__grid">
+          <label class="field field--wide"><span data-i18n="f.agent"></span>
+            <select name="agent" required id="agentSelect"></select>
+          </label>
+          <label class="field"><span data-i18n="f.company"></span><input name="company" autocomplete="organization" required /></label>
+          <label class="field"><span data-i18n="f.contact"></span><input name="contact" autocomplete="email" required data-type="contact" /></label>
+          <label class="field field--wide"><span data-i18n="f.need"></span><textarea name="need" rows="3" required></textarea></label>
+        </div>
+        <button type="submit" class="btn btn--primary form__submit" data-i18n="f.submit.conn">Отправить запрос</button>
+      </form>
+
+      <div class="form-done" id="formDone" hidden>
+        <span class="form-done__icon" aria-hidden="true">✓</span>
+        <h3 class="form__title" id="doneTitle"></h3>
+        <p id="doneText"></p>
+        <div class="cta-row">
+          <button type="button" class="btn btn--primary" data-close data-i18n="f.close">Закрыть</button>
+          <button type="button" class="btn btn--secondary" id="doneAgain" data-i18n="f.again">Заполнить снова</button>
+        </div>
       </div>
     </div>
   </div>
